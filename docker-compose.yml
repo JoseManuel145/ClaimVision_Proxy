@@ -2,7 +2,7 @@ services:
   gateway:
     build: .
     ports:
-      - "8000:8000"
+      - "80:8000"
     environment:
       - BACKEND_TRANSACCIONAL_URL=${BACKEND_TRANSACCIONAL_URL}
       - RATE_LIMIT_DEFAULT=${RATE_LIMIT_DEFAULT}
