@@ -125,10 +125,16 @@ class RequestSanitizationMiddleware(BaseHTTPMiddleware):
                 )
 
         content_length = request.headers.get("content-length")
-        if content_length and int(content_length) > settings.MAX_REQUEST_SIZE:
-            return JSONResponse(
-                status_code=413,
-                content={"detail": "Payload demasiado grande"},
-            )
+        if content_length:
+            path = request.url.path.lower()
+            limit = settings.MAX_REQUEST_SIZE_UPLOAD if any(
+                path.startswith(p) for p in settings.UPLOAD_PATHS
+            ) else settings.MAX_REQUEST_SIZE_DEFAULT
+
+            if int(content_length) > limit:
+                return JSONResponse(
+                    status_code=413,
+                    content={"detail": "Payload demasiado grande"},
+                )
 
         return await call_next(request)

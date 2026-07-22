@@ -33,6 +33,17 @@ async def proxy_to_backend(request: Request, path: str):
     try:
         body = await request.body()
 
+        path = path.lower()
+        limit = settings.MAX_REQUEST_SIZE_UPLOAD if any(
+            path.startswith(p.lstrip("/")) for p in settings.UPLOAD_PATHS
+        ) else settings.MAX_REQUEST_SIZE_DEFAULT
+
+        if len(body) > limit:
+            return JSONResponse(
+                status_code=413,
+                content={"detail": "Payload demasiado grande"},
+            )
+
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.request(
                 method=request.method,

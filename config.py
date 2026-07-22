@@ -9,7 +9,15 @@ class GatewaySettings(BaseSettings):
     ORIGINS: list[str] = ["*"]
 
     BLOCKED_IPS: list[str] = []
-    MAX_REQUEST_SIZE: int = 10_485_760
+    MAX_REQUEST_SIZE_DEFAULT: int = 10_485_760
+    MAX_REQUEST_SIZE_UPLOAD: int = 104_857_600
+    UPLOAD_PATHS: list[str] = [
+        "/api/v1/ia/predict",
+        "/api/v1/ia/v2/predict",
+        "/api/v1/ia/predict/v2",
+        "/api/v1/ia/ocr",
+        "/api/v1/ia/nlp/transcribir",
+    ]
 
     ENVIRONMENT: str = "production"
 
