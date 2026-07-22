@@ -1,0 +1,28 @@
+services:
+  gateway:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - BACKEND_TRANSACCIONAL_URL=${BACKEND_TRANSACCIONAL_URL}
+      - RATE_LIMIT_DEFAULT=${RATE_LIMIT_DEFAULT}
+      - ORIGINS=${ORIGINS}
+      - BLOCKED_IPS=${BLOCKED_IPS}
+      - MAX_REQUEST_SIZE=${MAX_REQUEST_SIZE}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - GATEWAY_INTERNAL_SECRET=${GATEWAY_INTERNAL_SECRET}
+      - LOG_LEVEL=${LOG_LEVEL}
+    volumes:
+      - .:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: claimvision_net
