@@ -2,10 +2,9 @@ from pydantic_settings import BaseSettings
 
 
 class GatewaySettings(BaseSettings):
-    BACKEND_TRANSACCIONAL_URL: str = "http://backend-transaccional:8000"
+    BACKEND_TRANSACCIONAL_URL: str = "http://backend:8000"
 
     RATE_LIMIT_DEFAULT: str = "60/minute"
-    RATE_LIMIT_AUTH: str = "10/minute"
 
     ORIGINS: list[str] = ["*"]
 
