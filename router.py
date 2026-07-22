@@ -20,7 +20,7 @@ async def health_check():
 
 @router.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy_to_backend(request: Request, path: str):
-    target_url = f"{BACKEND_URL}/api/v1/{path}"
+    target_url = f"{BACKEND_URL}/{path}"
 
     headers = {}
     for key, value in request.headers.items():
