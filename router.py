@@ -1,6 +1,6 @@
 import logging
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
+from starlette.responses import Response, JSONResponse, StreamingResponse
 from fastapi import APIRouter
 import httpx
 
@@ -42,6 +42,51 @@ async def proxy_to_backend(request: Request, path: str):
             return JSONResponse(
                 status_code=413,
                 content={"detail": "Payload demasiado grande"},
+            )
+
+        is_sse = "events/stream" in path or "text/event-stream" in headers.get("accept", "").lower()
+
+        if is_sse:
+            client = httpx.AsyncClient(timeout=None)
+            req = client.build_request(
+                method=request.method,
+                url=target_url,
+                headers=headers,
+                params=dict(request.query_params),
+            )
+            response = await client.send(req, stream=True)
+
+            if response.status_code != 200:
+                content = await response.aread()
+                await response.aclose()
+                await client.aclose()
+                return Response(
+                    content=content,
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                )
+
+            async def stream_generator():
+                try:
+                    async for chunk in response.aiter_bytes():
+                        yield chunk
+                finally:
+                    await response.aclose()
+                    await client.aclose()
+
+            excluded_headers = {
+                "content-encoding", "content-length", "transfer-encoding", "connection"
+            }
+            response_headers = {
+                k: v for k, v in response.headers.items()
+                if k.lower() not in excluded_headers
+            }
+
+            return StreamingResponse(
+                stream_generator(),
+                status_code=response.status_code,
+                headers=response_headers,
+                media_type="text/event-stream",
             )
 
         async with httpx.AsyncClient(timeout=60.0) as client:
