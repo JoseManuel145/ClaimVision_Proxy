@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 BACKEND_URL = settings.BACKEND_TRANSACCIONAL_URL
+PAY_URL = settings.PAY_SERVICE_URL
 
 
 @router.get("/health")
@@ -18,9 +19,19 @@ async def health_check():
     return {"status": "ok", "service": "claimvision-gateway"}
 
 
+@router.api_route("/api/v1/pay/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def proxy_to_pay(request: Request, path: str):
+    target_url = f"{PAY_URL}/api/v1/pay/{path}"
+    return await _proxy_request(request, target_url, path)
+
+
 @router.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy_to_backend(request: Request, path: str):
     target_url = f"{BACKEND_URL}/{path}"
+    return await _proxy_request(request, target_url, path)
+
+
+async def _proxy_request(request: Request, target_url: str, path: str):
 
     headers = {}
     for key, value in request.headers.items():
