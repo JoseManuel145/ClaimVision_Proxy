@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 class GatewaySettings(BaseSettings):
     BACKEND_TRANSACCIONAL_URL: str = "http://backend:8000"
     PAY_SERVICE_URL: str = "http://pay:8000"
+    IA_SERVICE_URL: str = "http://ia-api:8000"
 
     RATE_LIMIT_DEFAULT: str = "60/minute"
 

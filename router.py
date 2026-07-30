@@ -12,11 +12,30 @@ router = APIRouter()
 
 BACKEND_URL = settings.BACKEND_TRANSACCIONAL_URL
 PAY_URL = settings.PAY_SERVICE_URL
+IA_URL = settings.IA_SERVICE_URL
 
 
 @router.get("/health")
 async def health_check():
     return {"status": "ok", "service": "claimvision-gateway"}
+
+
+@router.api_route("/backend/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def proxy_docs_backend(request: Request, path: str):
+    target_url = f"{BACKEND_URL}/{path}"
+    return await _proxy_request(request, target_url, path)
+
+
+@router.api_route("/ia/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def proxy_docs_ia(request: Request, path: str):
+    target_url = f"{IA_URL}/{path}"
+    return await _proxy_request(request, target_url, path)
+
+
+@router.api_route("/pay/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def proxy_docs_pay(request: Request, path: str):
+    target_url = f"{PAY_URL}/{path}"
+    return await _proxy_request(request, target_url, path)
 
 
 @router.api_route("/api/v1/pay/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
