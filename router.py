@@ -22,19 +22,19 @@ async def health_check():
 
 @router.api_route("/backend/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy_docs_backend(request: Request, path: str):
-    target_url = f"{BACKEND_URL}/{path}"
+    target_url = f"{BACKEND_URL}/backend/{path}"
     return await _proxy_request(request, target_url, path)
 
 
 @router.api_route("/ia/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy_docs_ia(request: Request, path: str):
-    target_url = f"{IA_URL}/{path}"
+    target_url = f"{IA_URL}/ia/{path}"
     return await _proxy_request(request, target_url, path)
 
 
 @router.api_route("/pay/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy_docs_pay(request: Request, path: str):
-    target_url = f"{PAY_URL}/{path}"
+    target_url = f"{PAY_URL}/pay/{path}"
     return await _proxy_request(request, target_url, path)
 
 
